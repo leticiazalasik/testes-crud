@@ -77,4 +77,34 @@ describe('BooksController', () => {
                 expect(result).toBe(mockUpdatedBook);
             });
         });
+
+
+        describe('remove', () => {
+            it('should call service remove with correct id', () => {
+                // Mock do serviço para que possamos monitorar a chamada
+                const removeSpy = jest.spyOn(service, 'remove');
+              
+                service['books'] = [
+                  { id: 1, title: 'Book 1', author: 'Author 1', price: 10.00 },
+                  { id: 2, title: 'Book 2', author: 'Author 2', price: 15.00 },
+                ];
+              
+                // Chamando o método da controller
+                controller.remove('1');
+              
+                // Verificando se a função remove foi chamada com o id correto
+                expect(removeSpy).toHaveBeenCalledWith(1);
+              });
+              
+        
+              it('should throw NotFoundException if book not found', () => {
+                service['books'] = [
+                  { id: 2, title: 'Book 2', author: 'Author 2', price: 15.00 },
+                ];
+              
+                expect(() => controller.remove('999')).toThrow(NotFoundException);
+                expect(service.remove).toHaveBeenCalledWith(999);
+              });
     });
+
+})

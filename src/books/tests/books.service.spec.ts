@@ -83,64 +83,100 @@ describe('BooksService', () => {
 
   describe('update', () => {
     it('should update a book if it exists', () => {
-      const createBookDto: CreateBookDto = {
-        title: 'Test Book',
-        author: 'Test Author',
-        price: 29.99,
-      };
+        // Dados para criar um livro inicial
+        const createBookDto: CreateBookDto = {
+            title: 'Test Book',
+            author: 'Test Author',
+            price: 29.99,
+        };
 
-      // Criação de um livro para ser atualizado
-      const createdBook = service.create(createBookDto);
+        // Criação de um livro para ser atualizado
+        const createdBook = service.create(createBookDto);
 
-      // Dados para atualização
-      const updateBookDto: UpdateBookDto = {
-        title: 'Updated Book',
-        author: 'Updated Author',
-        price: 39.99,
-      };
+        // Dados para atualização
+        const updateBookDto: UpdateBookDto = {
+            title: 'Updated Book', // Novo título
+            author: 'Updated Author', // Novo autor
+            price: 39.99, // Novo preço
+        };
 
-      // Chamada do método update
-      const updatedBook = service.update(createdBook.id, updateBookDto);
+        // Chamada do método update no service
+        const updatedBook = service.update(createdBook.id, updateBookDto);
 
-      // Verificações
-      expect(updatedBook).toBeDefined();
-      expect(updatedBook.id).toBe(createdBook.id);
-      expect(updatedBook.title).toBe(updateBookDto.title);
-      expect(updatedBook.author).toBe(updateBookDto.author);
-      expect(updatedBook.price).toBe(updateBookDto.price);
-      expect(updatedBook.createdAt).toEqual(createdBook.createdAt);
+        // Verificações para confirmar que o livro foi atualizado corretamente
+        expect(updatedBook).toBeDefined(); // Verifica se o livro atualizado existe
+        expect(updatedBook.id).toBe(createdBook.id); // O ID deve ser o mesmo do livro original
+        expect(updatedBook.title).toBe(updateBookDto.title); // O título deve ser atualizado
+        expect(updatedBook.author).toBe(updateBookDto.author); // O autor deve ser atualizado
+        expect(updatedBook.price).toBe(updateBookDto.price); // O preço deve ser atualizado
+        expect(updatedBook.createdAt).toEqual(createdBook.createdAt); // A data de criação não deve ser alterada
     });
 
     it('should throw NotFoundException if book does not exist', () => {
-      const updateBookDto: UpdateBookDto = {
-        title: 'Updated Book',
-      };
+        // DTO com os dados de atualização
+        const updateBookDto: UpdateBookDto = {
+            title: 'Updated Book', // Novo título para o livro
+        };
 
-      expect(() =>
-        service.update(999, updateBookDto),
-      ).toThrow(NotFoundException);
+        // Tenta atualizar um livro que não existe (ID 999)
+        expect(() =>
+            service.update(999, updateBookDto),
+        ).toThrow(NotFoundException); // Verifica se o erro NotFoundException é lançado
     });
 
     it('should update only provided fields', () => {
-      // Primeiro criamos um livro
-      const createBookDto: CreateBookDto = {
-        title: 'Test Book',
-        author: 'Test Author',
-        price: 29.99,
-      };
-      const createdBook = service.create(createBookDto);
+        // Criação inicial de um livro com todos os campos preenchidos
+        const createBookDto: CreateBookDto = {
+            title: 'Test Book',
+            author: 'Test Author',
+            price: 29.99,
+        };
+        const createdBook = service.create(createBookDto);
 
-      // Atualizamos apenas o título
-      const updateBookDto: UpdateBookDto = {
-        title: 'Updated Book Title',
-      };
+        // Dados para atualizar apenas o título
+        const updateBookDto: UpdateBookDto = {
+            title: 'Updated Book Title', // Atualiza somente o título
+        };
 
-      const updatedBook = service.update(createdBook.id, updateBookDto);
+        // Atualização do livro
+        const updatedBook = service.update(createdBook.id, updateBookDto);
 
-      // Verificações
-      expect(updatedBook.title).toBe(updateBookDto.title);
-      expect(updatedBook.author).toBe(createdBook.author); // deve manter o valor original
-      expect(updatedBook.price).toBe(createdBook.price); // deve manter o valor original
+        // Verifica se apenas o campo título foi alterado
+        expect(updatedBook.title).toBe(updateBookDto.title); // O título foi atualizado
+        expect(updatedBook.author).toBe(createdBook.author); // O autor permaneceu inalterado
+        expect(updatedBook.price).toBe(createdBook.price); // O preço permaneceu inalterado
     });
-  });
 });
+
+
+
+describe('remove', () => {
+    it('should remove a book by id', () => {
+      // Estado inicial
+      service['books'] = [
+        { id: 1, title: 'Book 1', author: 'George teste', price: 10.0 },
+        { id: 2, title: 'Book 2', author: 'George teste', price: 10.0 },
+      ];
+  
+      // Removendo o livro com id: 1
+      service.remove(1);
+  
+      // Verificando que o livro com id: 1 foi removido
+      expect(service['books']).not.toContainEqual({ id: 1, title: 'Book 1', author: 'George teste', price: 10.0 });
+  
+      // Verificando que os outros livros permanecem inalterados
+      expect(service['books']).toContainEqual({ id: 2, title: 'Book 2', author: 'George teste', price: 10.0 });
+    });
+  
+    it('should throw NotFoundException if book not found', () => {
+        // Verificando o estado antes da remoção
+        expect(service['books'].length).toBe(2); // Inicialmente, o array tem 2 livros
+      
+        // Verificando se a exceção é lançada
+        expect(() => service.remove(999)).toThrow(NotFoundException);
+      
+        // O tamanho do array deve continuar o mesmo, já que a remoção falhou
+        expect(service['books'].length).toBe(2); // O livro com id: 2 ainda está presente
+      });
+  });
+})

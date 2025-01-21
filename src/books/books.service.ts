@@ -52,5 +52,6 @@ export class BooksService {
       throw new NotFoundException(`Book with ID ${id} not found`);
     }
     this.books.splice(bookIndex, 1);
+    
   }
 }

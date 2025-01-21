@@ -4,5 +4,5 @@ export class Book {
   title: string;
   author: string;
   price: number;
-  createdAt: Date;
+  createdAt?: Date;
 }
